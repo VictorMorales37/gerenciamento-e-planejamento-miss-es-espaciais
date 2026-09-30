@@ -1,7 +1,9 @@
 from terminal_ui import TerminalUI
 from api.solar_system_api import SolarSystemAPI
-import os
+from structures.tabela_hash import TabelaHash
 from dotenv import load_dotenv
+
+import os
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -13,4 +15,5 @@ if not api_key:
 
 api = SolarSystemAPI(api_key)
 #terminal.main_menu() 
-print(api.get_bodies())
+
+hashtable = TabelaHash()
