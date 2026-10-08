@@ -1,7 +1,8 @@
 # Documentação técnica — Planejador de Missões Espaciais
 
 **Projeto acadêmico — Grupo 9**  
-**Integrante:** Victor Morales  
+**Integrante:** Victor Matheus Marques Morales
+**Matrícula:** 25100782
 **Linguagem:** Python  
 **Data desta documentação:** 08/10/2026
 
