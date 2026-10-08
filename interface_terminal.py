@@ -24,7 +24,7 @@ class InterfaceTerminal:
             print("2. Buscar corpo por identificador")
             print("3. Filtrar corpos por tipo")
             print("4. Planejar missão")
-            print("5. Consultar métricas da tabela de dispersão")
+            print("5. Consultar métricas da tabela hash")
             print("0. Sair")
             escolha = input("Escolha: ").strip()
 

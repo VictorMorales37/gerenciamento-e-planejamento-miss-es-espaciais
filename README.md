@@ -53,7 +53,8 @@ mal aproveitada ou perder uma combinação de destinos com valor total maior.
 ## Estruturas
 
 - `TabelaHash` (`estruturas/tabela_hash.py`) calcula índices com uma função
-  polinomial de base 37 e implementa busca por identificador, inserção e atualização,
+  própria: acumula os caracteres em base 31 e mistura os bits do resultado.
+  Implementa busca por identificador, inserção e atualização,
   remoção, contagem de colisões, redimensionamento e fator de carga.
 - `ArvoreB` e `Trie` (`estruturas/trie.py`) são somente interfaces abstratas: declaram
   assinaturas de operações, sem implementar as estruturas.

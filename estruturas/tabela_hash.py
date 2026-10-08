@@ -11,8 +11,14 @@ class TabelaHash:
     def _calcular_indice(self, chave):
         valor = 0
         for caractere in chave:
-            valor = (valor * 37 + ord(caractere)) % self.capacidade
-        return valor
+            valor = (valor * 31 + ord(caractere)) & 0xFFFFFFFF
+
+        valor ^= valor >> 16
+        valor = (valor * 0x7FEB352D) & 0xFFFFFFFF
+        valor ^= valor >> 15
+        valor = (valor * 0x846CA68B) & 0xFFFFFFFF
+        valor ^= valor >> 16
+        return valor % self.capacidade
 
     def _localizar_posicao(self, chave):
         indice = self._calcular_indice(chave)
