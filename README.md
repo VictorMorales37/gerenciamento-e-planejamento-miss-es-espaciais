@@ -1,63 +1,69 @@
-# Planejador de missões espaciais
+# Crônicas do Espaço — Planejador de Missões Espaciais
 
-## Configuração e execução
+Projeto acadêmico em Python para consultar corpos celestes da API Solar System OpenData, armazená-los em uma tabela hash implementada manualmente e demonstrar planejamento guloso de destinos sob restrições de combustível e duração.
 
-Instale as dependências:
+**Grupo 9 — trabalho individual:** Victor Morales.
 
-```sh
-pip install -r requirements.txt
-```
+## Funcionalidades
 
-Defina `API_KEY` no ambiente ou em um arquivo `.env` na raiz do projeto e
-execute:
+- Carregamento dinâmico de corpos celestes por HTTP/JSON.
+- Armazenamento e busca por identificador com tabela hash própria e sondagem linear.
+- Listagem e filtragem de corpos por tipo.
+- Métricas de tamanho, capacidade, colisões contabilizadas e fator de carga.
+- Planejamento guloso didático com limites de combustível e duração.
 
-```sh
+## Documentação
+
+A documentação técnica completa está em **[docs/DOCUMENTACAO.md](docs/DOCUMENTACAO.md)**. Ela inclui:
+
+- fonte de dados, endpoints, exemplos de requisições e estrutura JSON;
+- modelagem dos corpos celestes e da missão;
+- representação, colisões, fator de carga e análise de complexidade da tabela hash;
+- análise amortizada do redimensionamento;
+- definição, critério e limitações do algoritmo guloso;
+- arquitetura, execução e melhorias possíveis.
+
+## Instalação e execução
+
+Requisitos: Python 3.10 ou superior e acesso à internet.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+export API_KEY="sua-chave"
 python main.py
 ```
 
-O programa lê `API_KEY` do ambiente ou do arquivo `.env` sem exigir uma
-biblioteca adicional para variáveis de ambiente. Ele carrega os corpos celestes
-da API, converte cada registro em um
-`CorpoCeleste` e o armazena na `TabelaHash` pelo identificador. A interface
-permite listar, pesquisar e filtrar corpos, planejar missões e consultar as
-métricas da tabela.
+No Windows, ative o ambiente virtual com `.venv\\Scripts\\activate`. Também é possível configurar `API_KEY=sua-chave` em um arquivo `.env` na raiz. **Não publique nem versione uma chave real.**
 
-## Planejamento guloso de missão
+A dependência externa está listada em `requirements.txt` (`requests`). O programa exige uma chave configurada no ambiente ou no arquivo `.env` e consulta a API durante a execução.
 
-A opção de planejamento pede o orçamento de combustível e a duração máxima.
-Como a API não fornece custos de viagem nem valor científico, o programa usa
-estimativas didáticas por tipo de corpo:
+## Planejamento guloso: escopo e limitações
 
-| Tipo | Valor científico | Combustível | Duração |
-| --- | ---: | ---: | ---: |
-| Planeta | 10 | 5 | 5 |
-| Lua | 6 | 2 | 2 |
-| Planeta anão | 7 | 4 | 4 |
-| Asteroide | 4 | 1 | 2 |
-| Cometa | 8 | 3 | 4 |
-| Estrela | 9 | 8 | 8 |
-| Outros | 3 | 3 | 3 |
+A heurística ordena os destinos pela razão `valor científico / custo de combustível`, depois adiciona os que cabem nos limites de combustível e duração. Os valores de mérito, combustível e duração são estimativas abstratas definidas no projeto — não são dados fornecidos pela API nem previsões de engenharia aeroespacial. O algoritmo respeita os limites configurados, mas não garante uma solução globalmente ótima e não calcula rotas ou transferências orbitais.
 
-Esses valores são unidades abstratas para demonstrar a otimização, não
-estimativas astronômicas ou de engenharia. O critério guloso ordena destinos
-pela razão `valor científico / combustível`, em ordem decrescente, com o
-identificador como desempate. Adiciona um destino se ambos os limites forem
-respeitados e continua avaliando os demais mesmo quando um candidato não cabe.
-Cada visita é tratada como independente: não são modelados rota, combustível de
-retorno, posição inicial ou tempo de trânsito.
+## Estruturas de dados
 
-A heurística produz uma solução viável, mas não garante o ótimo global: a
-ordenação prioriza eficiência de combustível e pode deixar capacidade de tempo
-mal aproveitada ou perder uma combinação de destinos com valor total maior.
+- `estruturas/tabela_hash.py`: implementação funcional usada para armazenar os corpos.
+- `estruturas/arvore_b.py` e `estruturas/trie.py`: interfaces abstratas, sem implementação completa das estruturas.
 
-## Estruturas
+## Fonte de dados
 
-- `TabelaHash` (`estruturas/tabela_hash.py`) calcula índices com uma função
-  própria: acumula os caracteres em base 31 e mistura os bits do resultado.
-  Implementa busca por identificador, inserção e atualização,
-  remoção, contagem de colisões, redimensionamento e fator de carga.
-- `ArvoreB` e `Trie` (`estruturas/trie.py`) são somente interfaces abstratas: declaram
-  assinaturas de operações, sem implementar as estruturas.
+Solar System OpenData: https://api.le-systeme-solaire.net/
 
-Os campos e valores recebidos da API externa preservam os nomes originais
-necessários para interpretar a resposta.
+## Estrutura do projeto
+
+```text
+.
+├── main.py
+├── interface_terminal.py
+├── requirements.txt
+├── docs/
+│   └── DOCUMENTACAO.md
+├── estruturas/
+├── modelo/
+├── repositorio/
+├── servicos/
+└── missao/
+```
