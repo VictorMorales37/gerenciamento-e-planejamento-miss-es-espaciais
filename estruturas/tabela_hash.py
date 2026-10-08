@@ -1,4 +1,4 @@
-class TabelaDispersao:
+class TabelaHash:
     def __init__(self, capacidade=10):
         if capacidade < 1:
             raise ValueError("A capacidade da tabela deve ser maior que zero.")
@@ -11,8 +11,8 @@ class TabelaDispersao:
     def _calcular_indice(self, chave):
         valor = 0
         for caractere in chave:
-            valor += ord(caractere)
-        return valor % self.capacidade
+            valor = (valor * 37 + ord(caractere)) % self.capacidade
+        return valor
 
     def _localizar_posicao(self, chave):
         indice = self._calcular_indice(chave)

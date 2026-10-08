@@ -136,7 +136,7 @@ class InterfaceTerminal:
         )
 
     def exibir_metricas(self):
-        metricas = self.repositorio.metricas_tabela_dispersao()
+        metricas = self.repositorio.metricas_tabela_hash()
         print(f"Corpos armazenados: {metricas['tamanho']}")
         print(f"Capacidade: {metricas['capacidade']}")
         print(f"Colisões: {metricas['colisoes']}")

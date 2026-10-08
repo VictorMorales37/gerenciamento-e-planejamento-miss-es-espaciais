@@ -4,7 +4,7 @@ from pathlib import Path
 from interface_terminal import InterfaceTerminal
 from repositorio.repositorio import Repositorio
 from servicos.sistema_solar import ServicoSistemaSolar
-from estruturas.tabela_dispersao import TabelaDispersao
+from estruturas.tabela_hash import TabelaHash
 
 
 def _obter_chave_api():
@@ -32,7 +32,7 @@ def executar():
         raise RuntimeError("Defina API_KEY no ambiente ou no arquivo .env.")
 
     servico_api = ServicoSistemaSolar(chave_api)
-    repositorio = Repositorio(servico_api, TabelaDispersao())
+    repositorio = Repositorio(servico_api, TabelaHash())
     repositorio.carregar_corpos()
     InterfaceTerminal(repositorio).exibir_menu_principal()
 

@@ -1,5 +1,5 @@
 from modelo.corpo_celeste import CorpoCeleste
-from estruturas.tabela_dispersao import TabelaDispersao
+from estruturas.tabela_hash import TabelaHash
 
 
 class Repositorio:
@@ -12,9 +12,9 @@ class Repositorio:
         "estrela": "star",
     }
 
-    def __init__(self, servico_api, tabela_dispersao: TabelaDispersao):
+    def __init__(self, servico_api, tabela_hash: TabelaHash):
         self.servico_api = servico_api
-        self.tabela_dispersao = tabela_dispersao
+        self.tabela_hash = tabela_hash
 
     @staticmethod
     def _converter_massa(massa):
@@ -60,16 +60,16 @@ class Repositorio:
 
         for dados in corpos:
             corpo = self._criar_corpo(dados)
-            self.tabela_dispersao.inserir(corpo.identificador, corpo)
+            self.tabela_hash.inserir(corpo.identificador, corpo)
         return len(corpos)
 
     def buscar(self, identificador: str):
-        return self.tabela_dispersao.buscar(identificador)
+        return self.tabela_hash.buscar(identificador)
 
     def listar(self):
         return [
             elemento[1]
-            for elemento in self.tabela_dispersao.tabela
+            for elemento in self.tabela_hash.tabela
             if elemento is not None
         ]
 
@@ -85,10 +85,10 @@ class Repositorio:
             if corpo.tipo.casefold() == tipo_normalizado
         ]
 
-    def metricas_tabela_dispersao(self):
+    def metricas_tabela_hash(self):
         return {
-            "colisoes": self.tabela_dispersao.colisoes,
-            "fator_carga": self.tabela_dispersao.fator_carga(),
-            "tamanho": self.tabela_dispersao.tamanho,
-            "capacidade": self.tabela_dispersao.capacidade,
+            "colisoes": self.tabela_hash.colisoes,
+            "fator_carga": self.tabela_hash.fator_carga(),
+            "tamanho": self.tabela_hash.tamanho,
+            "capacidade": self.tabela_hash.capacidade,
         }

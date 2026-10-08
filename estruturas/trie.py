@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ArvorePrefixos(ABC):
+class Trie(ABC):
     @abstractmethod
     def inserir(self, chave: str, valor: object) -> None:
         ...

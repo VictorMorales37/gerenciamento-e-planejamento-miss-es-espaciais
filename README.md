@@ -18,7 +18,7 @@ python main.py
 O programa lê `API_KEY` do ambiente ou do arquivo `.env` sem exigir uma
 biblioteca adicional para variáveis de ambiente. Ele carrega os corpos celestes
 da API, converte cada registro em um
-`CorpoCeleste` e o armazena na `TabelaDispersao` pelo identificador. A interface
+`CorpoCeleste` e o armazena na `TabelaHash` pelo identificador. A interface
 permite listar, pesquisar e filtrar corpos, planejar missões e consultar as
 métricas da tabela.
 
@@ -52,11 +52,11 @@ mal aproveitada ou perder uma combinação de destinos com valor total maior.
 
 ## Estruturas
 
-- `TabelaDispersao` implementa busca por identificador, inserção e atualização,
+- `TabelaHash` (`estruturas/tabela_hash.py`) calcula índices com uma função
+  polinomial de base 37 e implementa busca por identificador, inserção e atualização,
   remoção, contagem de colisões, redimensionamento e fator de carga.
-- `ArvoreB` e `ArvorePrefixos` são somente interfaces abstratas: declaram
+- `ArvoreB` e `Trie` (`estruturas/trie.py`) são somente interfaces abstratas: declaram
   assinaturas de operações, sem implementar as estruturas.
 
 Os campos e valores recebidos da API externa preservam os nomes originais
-necessários para interpretar a resposta. Os nomes de pastas, módulos, classes,
-funções e variáveis definidos pelo projeto estão em português.
+necessários para interpretar a resposta.
