@@ -1,8 +1,6 @@
-# Crônicas do Espaço — Planejador de Missões Espaciais
+# Planejador de Missões Espaciais
 
 Projeto acadêmico em Python para consultar corpos celestes da API Solar System OpenData, armazená-los em uma tabela hash implementada manualmente e demonstrar planejamento guloso de destinos sob restrições de combustível e duração.
-
-**Grupo 9 — trabalho individual:** Victor Morales.
 
 ## Funcionalidades
 
