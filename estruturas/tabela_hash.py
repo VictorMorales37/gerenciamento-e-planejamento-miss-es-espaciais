@@ -89,6 +89,15 @@ class TabelaHash:
     def fator_carga(self):
         return self.tamanho / self.capacidade
 
+    @property
+    def colisoes_atuais(self):
+        return sum(
+            1
+            for indice, elemento in enumerate(self.tabela)
+            if elemento is not None
+            and self._calcular_indice(elemento[0]) != indice
+        )
+
     def remover(self, chave):
         indice = self._calcular_indice(chave)
         indice_inicial = indice

@@ -88,6 +88,7 @@ class Repositorio:
     def metricas_tabela_hash(self):
         return {
             "colisoes": self.tabela_hash.colisoes,
+            "colisoes_atuais": self.tabela_hash.colisoes_atuais,
             "fator_carga": self.tabela_hash.fator_carga(),
             "tamanho": self.tabela_hash.tamanho,
             "capacidade": self.tabela_hash.capacidade,

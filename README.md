@@ -7,7 +7,8 @@ Projeto acadêmico em Python para consultar corpos celestes da API Solar System 
 - Carregamento dinâmico de corpos celestes por HTTP/JSON.
 - Armazenamento e busca por identificador com tabela hash própria e sondagem linear.
 - Listagem e filtragem de corpos por tipo.
-- Métricas de tamanho, capacidade, colisões contabilizadas e fator de carga.
+- Métricas de tamanho, capacidade, colisões registradas nas inserções, colisões
+  presentes na disposição atual da tabela e fator de carga.
 - Planejamento guloso didático com limites de combustível e duração.
 
 ## Documentação
@@ -39,7 +40,7 @@ A dependência externa está listada em `requirements.txt` (`requests`). O progr
 
 ## Planejamento guloso: escopo e limitações
 
-A heurística ordena os destinos pela razão `valor científico / custo de combustível`, depois adiciona os que cabem nos limites de combustível e duração. Os valores de mérito, combustível e duração são estimativas abstratas definidas no projeto — não são dados fornecidos pela API nem previsões de engenharia aeroespacial. O algoritmo respeita os limites configurados, mas não garante uma solução globalmente ótima e não calcula rotas ou transferências orbitais.
+A heurística ordena os destinos pela razão `valor científico / custo de combustível`, depois adiciona os que cabem nos limites de combustível e duração. O valor científico soma massa, raio, gravidade, temperatura e distância ao Sol, cada uma dividida por uma referência da Terra ou por uma unidade astronômica, para normalizar as unidades e escalas. Campos ausentes contribuem com zero; a pontuação é heurística, não uma avaliação científica validada. Combustível e duração continuam sendo estimativas abstratas, não previsões de engenharia aeroespacial. Os custos de combustível foram ampliados para centenas de unidades e a entrada informa o mínimo necessário para visitar um destino disponível. O algoritmo respeita os limites configurados, mas não garante uma solução globalmente ótima e não calcula rotas ou transferências orbitais.
 
 ## Estruturas de dados
 

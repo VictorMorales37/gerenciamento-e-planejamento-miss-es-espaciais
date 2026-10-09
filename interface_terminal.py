@@ -79,7 +79,19 @@ class InterfaceTerminal:
         self.exibir_corpo(corpo)
 
     def filtrar_corpos(self):
-        tipo = input("Tipo do corpo (por exemplo, Planeta): ").strip()
+        tipos_disponiveis = sorted(
+            {corpo.tipo for corpo in self.repositorio.listar()},
+            key=lambda tipo: self._nome_tipo(tipo).casefold(),
+        )
+        if tipos_disponiveis:
+            tipos_formatados = ", ".join(
+                self._nome_tipo(tipo) for tipo in tipos_disponiveis
+            )
+            print(f"Tipos disponíveis: {tipos_formatados}")
+        else:
+            print("Nenhum tipo disponível para filtrar.")
+
+        tipo = input("Tipo do corpo: ").strip()
         corpos = self.repositorio.filtrar_por_tipo(tipo)
         if not corpos:
             print("Nenhum corpo encontrado para esse tipo.")
@@ -104,12 +116,25 @@ class InterfaceTerminal:
             return valor
 
     def planejar_missao(self):
-        combustivel = self._ler_limite("Orçamento de combustível (unidades): ")
-        duracao = self._ler_limite("Duração máxima (unidades): ")
         destinos = [
             Destino.de_corpo(corpo)
             for corpo in self.repositorio.listar()
         ]
+        minimo_combustivel = min(
+            (destino.custo_combustivel for destino in destinos),
+            default=None,
+        )
+        if minimo_combustivel is None:
+            detalhe_minimo = "nenhum destino disponível"
+        else:
+            detalhe_minimo = (
+                f"mínimo individual: {minimo_combustivel:g}"
+            )
+
+        combustivel = self._ler_limite(
+            f"Orçamento de combustível ({detalhe_minimo} unidades): "
+        )
+        duracao = self._ler_limite("Duração máxima (unidades): ")
         missao = PlanejadorGuloso().planejar(destinos, combustivel, duracao)
 
         if not missao.destinos:
@@ -139,5 +164,9 @@ class InterfaceTerminal:
         metricas = self.repositorio.metricas_tabela_hash()
         print(f"Corpos armazenados: {metricas['tamanho']}")
         print(f"Capacidade: {metricas['capacidade']}")
-        print(f"Colisões: {metricas['colisoes']}")
+        print(f"Colisões registradas em inserções: {metricas['colisoes']}")
+        print(
+            "Colisões atuais (elementos deslocados): "
+            f"{metricas['colisoes_atuais']}"
+        )
         print(f"Fator de carga: {metricas['fator_carga']:.2f}")

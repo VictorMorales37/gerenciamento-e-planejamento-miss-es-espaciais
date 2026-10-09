@@ -4,6 +4,15 @@ import math
 from modelo.corpo_celeste import CorpoCeleste
 
 
+_REFERENCIAS_NORMALIZACAO = {
+    "massa": 5.9722e24,
+    "raio": 6371.0,
+    "gravidade": 9.80665,
+    "temperatura": 288.15,
+    "distancia_sol": 149597870.7,
+}
+
+
 @dataclass(frozen=True)
 class Destino:
     corpo: CorpoCeleste
@@ -12,8 +21,12 @@ class Destino:
     duracao: float
 
     def __post_init__(self):
+        if not math.isfinite(self.valor_cientifico) or self.valor_cientifico < 0:
+            raise ValueError(
+                "O valor científico deve ser finito e não negativo."
+            )
+
         for nome, valor in (
-            ("valor científico", self.valor_cientifico),
             ("custo de combustível", self.custo_combustivel),
             ("duração", self.duracao),
         ):
@@ -30,17 +43,31 @@ class Destino:
 
     @classmethod
     def de_corpo(cls, corpo):
-        estimativas = {
-            "planet": (10, 5, 5),
-            "moon": (6, 2, 2),
-            "dwarf planet": (7, 4, 4),
-            "asteroid": (4, 1, 2),
-            "comet": (8, 3, 4),
-            "star": (9, 8, 8),
+        valor = sum(
+            medida / referencia
+            for medida, referencia in (
+                (corpo.massa, _REFERENCIAS_NORMALIZACAO["massa"]),
+                (corpo.raio, _REFERENCIAS_NORMALIZACAO["raio"]),
+                (corpo.gravidade, _REFERENCIAS_NORMALIZACAO["gravidade"]),
+                (corpo.temperatura, _REFERENCIAS_NORMALIZACAO["temperatura"]),
+                (
+                    corpo.distancia_sol,
+                    _REFERENCIAS_NORMALIZACAO["distancia_sol"],
+                ),
+            )
+            if medida is not None
+        )
+        estimativas_logisticas = {
+            "planet": (500, 5),
+            "moon": (200, 2),
+            "dwarf planet": (400, 4),
+            "asteroid": (100, 2),
+            "comet": (300, 4),
+            "star": (800, 8),
         }
-        valor, combustivel, duracao = estimativas.get(
+        combustivel, duracao = estimativas_logisticas.get(
             corpo.tipo.casefold(),
-            (3, 3, 3),
+            (300, 3),
         )
         return cls(
             corpo=corpo,

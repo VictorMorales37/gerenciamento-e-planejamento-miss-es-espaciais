@@ -145,7 +145,8 @@ A classe `TabelaHash` é a estrutura principal efetivamente implementada e usada
 - A colisão é resolvida por **endereçamento aberto com sondagem linear**: após uma posição ocupada, a busca continua na próxima posição, com retorno circular ao início.
 - Ao inserir uma nova chave, a tabela é redimensionada para o dobro da capacidade se a carga resultante ultrapassar 0,75.
 - A remoção limpa a posição e reorganiza os elementos subsequentes do agrupamento para que continuem encontráveis.
-- A interface exibe tamanho, capacidade, colisões contabilizadas e fator de carga.
+- A interface exibe tamanho, capacidade, colisões registradas nas inserções,
+  colisões presentes na disposição atual e fator de carga.
 
 O fator de carga é:
 
@@ -153,7 +154,9 @@ O fator de carga é:
 fator de carga = quantidade de elementos / capacidade da tabela
 ```
 
-A contagem de colisões contabiliza posições ocupadas atravessadas durante inserções comuns. Os elementos movidos durante o redimensionamento e a reorganização após remoção são reinseridos sem incrementar esse contador. Portanto, a métrica descreve as colisões registradas pelo mecanismo de inserção, não o número total de sondagens de todas as operações.
+A contagem de colisões registradas contabiliza posições ocupadas atravessadas durante inserções comuns. Os elementos movidos durante o redimensionamento e a reorganização após remoção são reinseridos sem incrementar esse contador. Portanto, a métrica descreve as colisões registradas pelo mecanismo de inserção, não o número total de sondagens de todas as operações.
+
+A contagem de colisões atuais é calculada sobre a disposição presente da tabela: conta os elementos que estão armazenados em um índice diferente do índice inicial calculado para sua chave. É recalculada quando as métricas são consultadas, portanto reflete o resultado de redimensionamentos e remoções, mas não é uma contagem histórica nem o total de sondagens feitas.
 
 ### Complexidade
 
@@ -187,23 +190,37 @@ A entrada do planejador é a lista de corpos celestes carregada pela API e dois 
 1. orçamento máximo de combustível;
 2. duração máxima da missão.
 
-Cada corpo é convertido em um candidato `Destino` com três valores didáticos: valor científico, custo de combustível e duração. O objetivo é selecionar destinos sem ultrapassar nenhum dos dois recursos e maximizar, de forma heurística, o valor científico total.
+Cada corpo é convertido em um candidato `Destino` com um valor científico, um custo de combustível e uma duração. O objetivo é selecionar destinos sem ultrapassar nenhum dos dois recursos e maximizar, de forma heurística, o valor científico total.
 
-### Estimativas usadas
+### Valor científico e estimativas logísticas
 
-A API consultada não fornece os custos de missão usados pelo algoritmo. Por isso, o projeto atribui valores abstratos por tipo de corpo:
+O valor científico é calculado a partir dos dados disponíveis em `CorpoCeleste`, normalizando cada medida por uma referência física:
 
-| Tipo recebido | Valor científico | Combustível | Duração |
-|---|---:|---:|---:|
-| Planeta (`planet`) | 10 | 5 | 5 |
-| Lua (`moon`) | 6 | 2 | 2 |
-| Planeta anão (`dwarf planet`) | 7 | 4 | 4 |
-| Asteroide (`asteroid`) | 4 | 1 | 2 |
-| Cometa (`comet`) | 8 | 3 | 4 |
-| Estrela (`star`) | 9 | 8 | 8 |
-| Outro tipo | 3 | 3 | 3 |
+```text
+valor científico =
+    massa / (5,9722 × 10²⁴ kg)
+  + raio / (6.371 km)
+  + gravidade / (9,80665 m/s²)
+  + temperatura / (288,15 K)
+  + distância ao Sol / (149.597.870,7 km)
+```
 
-Os valores são unidades abstratas para fins acadêmicos. Não são medições reais, custos de combustível de uma espaçonave ou estimativas de duração de uma viagem.
+As referências são, respectivamente, a massa, o raio, a gravidade e a temperatura média da Terra, e uma unidade astronômica (UA). Assim, cada termo é adimensional e representa a medida em relação à sua referência. Campos ausentes (`None`) não contribuem para a soma; um corpo sem nenhuma dessas medições recebe valor científico zero. A soma atribui peso igual a cada termo normalizado, mas continua sendo uma pontuação heurística, não uma grandeza física nem uma avaliação científica validada.
+
+A API não fornece os custos de missão usados pelo algoritmo. Combustível e duração são estimativas abstratas por tipo de corpo:
+
+| Tipo recebido | Combustível (unidades) | Duração (unidades) |
+|---|---:|---:|
+| Planeta (`planet`) | 500 | 5 |
+| Lua (`moon`) | 200 | 2 |
+| Planeta anão (`dwarf planet`) | 400 | 4 |
+| Asteroide (`asteroid`) | 100 | 2 |
+| Cometa (`comet`) | 300 | 4 |
+| Estrela (`star`) | 800 | 8 |
+| Outro tipo | 300 | 3 |
+
+Essas estimativas não são custos reais de combustível de uma espaçonave ou estimativas de duração de uma viagem.
+A entrada do orçamento informa o menor custo individual entre os destinos carregados; ainda é necessário ter duração suficiente para visitar esse destino. Se nenhum destino estiver carregado, a interface informa que não há destinos disponíveis.
 
 ### Critério de escolha
 
@@ -237,9 +254,9 @@ Portanto, a complexidade total é O(m²) no pior caso, dominada pela verificaç�
 
 1. **Listar corpos celestes:** apresenta identificador, nome e tipo, ordenados pelo identificador.
 2. **Buscar por identificador:** consulta a tabela hash e exibe os atributos disponíveis.
-3. **Filtrar por tipo:** percorre os registros armazenados e compara o tipo normalizado.
+3. **Filtrar por tipo:** mostra os tipos presentes nos corpos carregados e percorre os registros para comparar o tipo informado de forma normalizada.
 4. **Planejar missão:** solicita os limites de combustível e duração, executa a heurística gulosa e apresenta destinos e totais.
-5. **Consultar métricas:** mostra tamanho, capacidade, colisões registradas e fator de carga.
+5. **Consultar métricas:** mostra tamanho, capacidade, colisões registradas nas inserções, colisões atuais (elementos deslocados) e fator de carga.
 6. **Sair:** encerra o menu.
 
 A busca por identificador é a operação diretamente apoiada pela tabela hash. Listagem e filtragem percorrem os elementos armazenados.
